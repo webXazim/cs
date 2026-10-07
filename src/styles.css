@@ -6135,7 +6135,175 @@ section[id], article[id] { scroll-margin-top: 20px !important; }
     opacity:1 !important;
   }
 }
-\n\n/* ==========================================================================\n   Premium wordmark trace — restrained outline-to-fill identity transition\n   Inspired by the supplied stroke-draw reference, adapted for one-shot brand motion.\n   ========================================================================== */\n.global-brand-navigator {\n  --brand-wordmark-ink:#111827;\n  --brand-wordmark-trace:rgba(72,82,101,.52);\n  --brand-wordmark-trace-soft:rgba(72,82,101,.20);\n}\n.global-brand-navigator.brand-navigator--dark {\n  --brand-wordmark-ink:#f7f8fb;\n  --brand-wordmark-trace:rgba(240,243,249,.58);\n  --brand-wordmark-trace-soft:rgba(240,243,249,.20);\n}\n\n.global-brand-navigator .brand-text-stage {\n  perspective:none !important;\n}\n\n.global-brand-navigator .brand-text-char-slot {\n  overflow:visible !important;\n}\n\n.global-brand-navigator .brand-text-char {\n  position:relative !important;\n  isolation:isolate !important;\n  transform:none !important;\n  transform-origin:50% 70% !important;\n  -webkit-font-smoothing:antialiased;\n  text-rendering:geometricPrecision;\n}\n\n/* Outgoing suffix: solid ink becomes a fine trace, then resolves away. */\n.global-brand-navigator.is-text-morphing .brand-text-outgoing .brand-text-char {\n  color:var(--brand-wordmark-ink) !important;\n  -webkit-text-stroke:0 transparent !important;\n  animation:csBrandTraceOut 300ms cubic-bezier(.42,0,.58,1) both !important;\n  animation-delay:calc(24ms + var(--char-reverse) * 9ms) !important;\n}\n\n/* Incoming suffix: first the hairline drawing, then the solid fill follows it. */\n.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char {\n  color:transparent !important;\n  -webkit-text-stroke:.72px var(--brand-wordmark-trace) !important;\n  opacity:0;\n  animation:csBrandTraceIn 390ms cubic-bezier(.16,.84,.24,1) both !important;\n  animation-delay:calc(175ms + var(--char-index) * 18ms) !important;\n}\n\n.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char::after {\n  content:attr(data-char);\n  position:absolute;\n  inset:0;\n  z-index:2;\n  color:var(--brand-wordmark-ink);\n  -webkit-text-stroke:0 transparent;\n  clip-path:inset(0 100% 0 0);\n  opacity:.98;\n  transform:translateY(.025em);\n  animation:csBrandInkFill 360ms cubic-bezier(.18,.78,.24,1) both;\n  animation-delay:calc(310ms + var(--char-index) * 18ms);\n  pointer-events:none;\n}\n\n/* A tiny neutral glint rides the fill edge; it is intentionally very faint. */\n.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char::before {\n  content:"";\n  position:absolute;\n  top:.08em;\n  bottom:.04em;\n  left:-.08em;\n  width:.12em;\n  z-index:3;\n  border-radius:999px;\n  background:linear-gradient(to bottom,transparent,var(--brand-wordmark-trace-soft),transparent);\n  opacity:0;\n  transform:translateX(-.08em);\n  animation:csBrandInkEdge 310ms cubic-bezier(.2,.7,.2,1) both;\n  animation-delay:calc(320ms + var(--char-index) * 18ms);\n  pointer-events:none;\n}\n\n@keyframes csBrandTraceOut {\n  0% {\n    opacity:1;\n    color:var(--brand-wordmark-ink);\n    -webkit-text-stroke:0 transparent;\n    filter:blur(0);\n  }\n  48% {\n    opacity:.78;\n    color:transparent;\n    -webkit-text-stroke:.7px var(--brand-wordmark-trace);\n  }\n  100% {\n    opacity:0;\n    color:transparent;\n    -webkit-text-stroke:.55px var(--brand-wordmark-trace-soft);\n    filter:blur(.45px);\n  }\n}\n\n@keyframes csBrandTraceIn {\n  0% {\n    opacity:0;\n    color:transparent;\n    -webkit-text-stroke:.55px transparent;\n    letter-spacing:.018em;\n    filter:blur(.35px);\n  }\n  35% {\n    opacity:.92;\n    -webkit-text-stroke:.72px var(--brand-wordmark-trace);\n  }\n  78% {\n    opacity:1;\n    -webkit-text-stroke:.48px var(--brand-wordmark-trace);\n    letter-spacing:0;\n    filter:blur(0);\n  }\n  100% {\n    opacity:1;\n    -webkit-text-stroke:.34px var(--brand-wordmark-trace-soft);\n    letter-spacing:0;\n    filter:blur(0);\n  }\n}\n\n@keyframes csBrandInkFill {\n  0% { clip-path:inset(0 100% 0 0); opacity:0; transform:translateY(.025em); }\n  18% { opacity:.72; }\n  100% { clip-path:inset(0 0 0 0); opacity:1; transform:translateY(0); }\n}\n\n@keyframes csBrandInkEdge {\n  0%,12% { opacity:0; transform:translateX(-.08em); }\n  42% { opacity:.45; }\n  100% { opacity:0; transform:translateX(.82em); }\n}\n\n/* Ensure the stable shared prefix remains perfectly still while the suffix traces. */\n.global-brand-navigator .brand-text-prefix {\n  color:var(--brand-wordmark-ink) !important;\n  -webkit-text-stroke:0 transparent !important;\n  transform:none !important;\n  filter:none !important;\n}\n\n@media (prefers-reduced-motion:reduce) {\n  .global-brand-navigator .brand-text-char,\n  .global-brand-navigator .brand-text-char::before,\n  .global-brand-navigator .brand-text-char::after {\n    animation:none !important;\n    transition:none !important;\n    filter:none !important;\n    transform:none !important;\n    opacity:1 !important;\n    clip-path:none !important;\n  }\n  .global-brand-navigator .brand-text-char {\n    color:var(--brand-wordmark-ink) !important;\n    -webkit-text-stroke:0 transparent !important;\n  }\n  .global-brand-navigator .brand-text-char::before,\n  .global-brand-navigator .brand-text-char::after { content:none !important; }\n}\n
+
+
+/* ==========================================================================
+   Premium wordmark trace — restrained outline-to-fill identity transition
+   Inspired by the supplied stroke-draw reference, adapted for one-shot brand motion.
+   ========================================================================== */
+.global-brand-navigator {
+  --brand-wordmark-ink:#111827;
+  --brand-wordmark-trace:rgba(72,82,101,.52);
+  --brand-wordmark-trace-soft:rgba(72,82,101,.20);
+}
+.global-brand-navigator.brand-navigator--dark {
+  --brand-wordmark-ink:#f7f8fb;
+  --brand-wordmark-trace:rgba(240,243,249,.58);
+  --brand-wordmark-trace-soft:rgba(240,243,249,.20);
+}
+
+.global-brand-navigator .brand-text-stage {
+  perspective:none !important;
+}
+
+.global-brand-navigator .brand-text-char-slot {
+  overflow:visible !important;
+}
+
+.global-brand-navigator .brand-text-char {
+  position:relative !important;
+  isolation:isolate !important;
+  transform:none !important;
+  transform-origin:50% 70% !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+
+/* Outgoing suffix: solid ink becomes a fine trace, then resolves away. */
+.global-brand-navigator.is-text-morphing .brand-text-outgoing .brand-text-char {
+  color:var(--brand-wordmark-ink) !important;
+  -webkit-text-stroke:0 transparent !important;
+  animation:csBrandTraceOut 300ms cubic-bezier(.42,0,.58,1) both !important;
+  animation-delay:calc(24ms + var(--char-reverse) * 9ms) !important;
+}
+
+/* Incoming suffix: first the hairline drawing, then the solid fill follows it. */
+.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char {
+  color:transparent !important;
+  -webkit-text-stroke:.72px var(--brand-wordmark-trace) !important;
+  opacity:0;
+  animation:csBrandTraceIn 390ms cubic-bezier(.16,.84,.24,1) both !important;
+  animation-delay:calc(175ms + var(--char-index) * 18ms) !important;
+}
+
+.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char::after {
+  content:attr(data-char);
+  position:absolute;
+  inset:0;
+  z-index:2;
+  color:var(--brand-wordmark-ink);
+  -webkit-text-stroke:0 transparent;
+  clip-path:inset(0 100% 0 0);
+  opacity:.98;
+  transform:translateY(.025em);
+  animation:csBrandInkFill 360ms cubic-bezier(.18,.78,.24,1) both;
+  animation-delay:calc(310ms + var(--char-index) * 18ms);
+  pointer-events:none;
+}
+
+/* A tiny neutral glint rides the fill edge; it is intentionally very faint. */
+.global-brand-navigator.is-text-morphing .brand-text-incoming .brand-text-char::before {
+  content:"";
+  position:absolute;
+  top:.08em;
+  bottom:.04em;
+  left:-.08em;
+  width:.12em;
+  z-index:3;
+  border-radius:999px;
+  background:linear-gradient(to bottom,transparent,var(--brand-wordmark-trace-soft),transparent);
+  opacity:0;
+  transform:translateX(-.08em);
+  animation:csBrandInkEdge 310ms cubic-bezier(.2,.7,.2,1) both;
+  animation-delay:calc(320ms + var(--char-index) * 18ms);
+  pointer-events:none;
+}
+
+@keyframes csBrandTraceOut {
+  0% {
+    opacity:1;
+    color:var(--brand-wordmark-ink);
+    -webkit-text-stroke:0 transparent;
+    filter:blur(0);
+  }
+  48% {
+    opacity:.78;
+    color:transparent;
+    -webkit-text-stroke:.7px var(--brand-wordmark-trace);
+  }
+  100% {
+    opacity:0;
+    color:transparent;
+    -webkit-text-stroke:.55px var(--brand-wordmark-trace-soft);
+    filter:blur(.45px);
+  }
+}
+
+@keyframes csBrandTraceIn {
+  0% {
+    opacity:0;
+    color:transparent;
+    -webkit-text-stroke:.55px transparent;
+    letter-spacing:.018em;
+    filter:blur(.35px);
+  }
+  35% {
+    opacity:.92;
+    -webkit-text-stroke:.72px var(--brand-wordmark-trace);
+  }
+  78% {
+    opacity:1;
+    -webkit-text-stroke:.48px var(--brand-wordmark-trace);
+    letter-spacing:0;
+    filter:blur(0);
+  }
+  100% {
+    opacity:1;
+    -webkit-text-stroke:.34px var(--brand-wordmark-trace-soft);
+    letter-spacing:0;
+    filter:blur(0);
+  }
+}
+
+@keyframes csBrandInkFill {
+  0% { clip-path:inset(0 100% 0 0); opacity:0; transform:translateY(.025em); }
+  18% { opacity:.72; }
+  100% { clip-path:inset(0 0 0 0); opacity:1; transform:translateY(0); }
+}
+
+@keyframes csBrandInkEdge {
+  0%,12% { opacity:0; transform:translateX(-.08em); }
+  42% { opacity:.45; }
+  100% { opacity:0; transform:translateX(.82em); }
+}
+
+/* Ensure the stable shared prefix remains perfectly still while the suffix traces. */
+.global-brand-navigator .brand-text-prefix {
+  color:var(--brand-wordmark-ink) !important;
+  -webkit-text-stroke:0 transparent !important;
+  transform:none !important;
+  filter:none !important;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .global-brand-navigator .brand-text-char,
+  .global-brand-navigator .brand-text-char::before,
+  .global-brand-navigator .brand-text-char::after {
+    animation:none !important;
+    transition:none !important;
+    filter:none !important;
+    transform:none !important;
+    opacity:1 !important;
+    clip-path:none !important;
+  }
+  .global-brand-navigator .brand-text-char {
+    color:var(--brand-wordmark-ink) !important;
+    -webkit-text-stroke:0 transparent !important;
+  }
+  .global-brand-navigator .brand-text-char::before,
+  .global-brand-navigator .brand-text-char::after { content:none !important; }
+}
+
 /* ========================================================================== 
    True SVG wordmark trace — visible outline-to-fill transformation
    ========================================================================== */
@@ -6470,7 +6638,22 @@ section[id], article[id] { scroll-margin-top: 20px !important; }
     clip-path:none !important;
   }
 }
-\n\n/* ==========================================================================\n   Single-wordmark handoff invariant — never stack root + destination names\n   ========================================================================== */\n.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label] {\n  isolation:isolate !important;\n}\n.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label] > svg {\n  left:0 !important;\n  margin:0 !important;\n}\n.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label].brand-wordmark-tracing > .brand-wordmark-stable-svg {\n  display:none !important;\n}\n
+
+
+/* ==========================================================================
+   Single-wordmark handoff invariant — never stack root + destination names
+   ========================================================================== */
+.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label] {
+  isolation:isolate !important;
+}
+.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label] > svg {
+  left:0 !important;
+  margin:0 !important;
+}
+.global-brand-navigator .brand-navigator-current-copy strong[data-brand-current-label].brand-wordmark-tracing > .brand-wordmark-stable-svg {
+  display:none !important;
+}
+
 /* ========================================================================== 
    Upgrade 6 — Standalone product pages
    Product-first storytelling for the current, independent CrescentSphere tools.
