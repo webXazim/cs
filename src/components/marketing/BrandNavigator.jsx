@@ -93,7 +93,11 @@ export default function BrandNavigator({
   const openMenu = useCallback(({ focus = false } = {}) => {
     if (transitioning) return;
     setOpen(true);
-    if (focus) requestAnimationFrame(() => itemRefs.current.get(activeState)?.focus({ preventScroll: true }));
+    if (focus) requestAnimationFrame(() => {
+      const items = [...itemRefs.current.values()].filter((node) => node.getClientRects().length > 0);
+      const current = itemRefs.current.get(activeState);
+      (items.includes(current) ? current : items[0])?.focus({ preventScroll: true });
+    });
   }, [transitioning, activeState]);
 
   const onTriggerKeyDown = (event) => {
@@ -111,11 +115,13 @@ export default function BrandNavigator({
   };
 
   const onItemKeyDown = (event, index) => {
+    const visibleStates = BRAND_STATE_ORDER.filter((key) => itemRefs.current.get(key)?.getClientRects().length > 0);
+    const visibleIndex = visibleStates.indexOf(BRAND_STATE_ORDER[index]);
     let targetIndex = null;
-    if (['ArrowRight', 'ArrowDown'].includes(event.key)) targetIndex = (index + 1) % BRAND_STATE_ORDER.length;
-    else if (['ArrowLeft', 'ArrowUp'].includes(event.key)) targetIndex = (index - 1 + BRAND_STATE_ORDER.length) % BRAND_STATE_ORDER.length;
+    if (['ArrowRight', 'ArrowDown'].includes(event.key)) targetIndex = (visibleIndex + 1) % visibleStates.length;
+    else if (['ArrowLeft', 'ArrowUp'].includes(event.key)) targetIndex = (visibleIndex - 1 + visibleStates.length) % visibleStates.length;
     else if (event.key === 'Home') targetIndex = 0;
-    else if (event.key === 'End') targetIndex = BRAND_STATE_ORDER.length - 1;
+    else if (event.key === 'End') targetIndex = visibleStates.length - 1;
     else if (event.key === 'Escape') {
       event.preventDefault();
       close({ returnFocus: true });
@@ -123,7 +129,7 @@ export default function BrandNavigator({
     }
     if (targetIndex !== null) {
       event.preventDefault();
-      itemRefs.current.get(BRAND_STATE_ORDER[targetIndex])?.focus({ preventScroll: true });
+      itemRefs.current.get(visibleStates[targetIndex])?.focus({ preventScroll: true });
     }
   };
 
@@ -184,7 +190,7 @@ export default function BrandNavigator({
                 const meta = BRAND_STATES[itemState];
                 const selected = itemState === activeState;
                 return (
-                  <button
+                  <a
                     key={itemState}
                     ref={(node) => {
                       if (node) itemRefs.current.set(itemState, node);
@@ -195,14 +201,19 @@ export default function BrandNavigator({
                     data-brand-path={meta.path}
                     data-brand-state={itemState}
                     role="menuitemradio"
-                    tabIndex={selected ? 0 : -1}
-                    type="button"
-                    onClick={() => choose(itemState)}
+                    tabIndex={0}
+                    href={itemState === 'master' ? '/' : `https://${itemState}.crescentsphere.com`}
+                    onClick={(event) => {
+                      if (itemState === 'master') {
+                        event.preventDefault();
+                        choose(itemState);
+                      } else close();
+                    }}
                     onKeyDown={(event) => onItemKeyDown(event, index)}
                   >
                     <cs-brand-logo aria-hidden="true" label="" state={itemState}></cs-brand-logo>
                     <span><strong>{meta.label}</strong><small>{meta.description}</small></span>
-                  </button>
+                  </a>
                 );
               })}
             </div>

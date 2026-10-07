@@ -3846,6 +3846,7 @@ cs-brand-logo { flex: 0 0 auto; }
   gap: 4px;
 }
 .brand-family-item {
+  text-decoration: none;
   min-width: 0;
   height: 44px;
   display: grid;
